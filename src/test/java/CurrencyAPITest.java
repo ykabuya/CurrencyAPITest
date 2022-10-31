@@ -13,20 +13,41 @@ public class CurrencyAPITest {
 
     public static Response response;
 
-
     @Test
-    public void listOfALLCurrenciesTest() {
-        response = given().contentType("application/json").get(Consts.CURRENCY_API_URL + Consts.TOKEN  + "&" + Consts.LIST);
+    public void validTokenTest() {
+        response = given().get(Consts.CURRENCY_API_URL + Consts.LIVE + Consts.TOKEN);
+        System.out.println(response.asString());
         response.then().statusCode(200);
         response.then().body("success", equalTo(true));
-        System.out.println(response.asString());
+        response.then().body("source", equalTo("USD"));
     }
+    @Test
+    public void invalidTokenTest() {
+        response = given().get(Consts.CURRENCY_API_URL + Consts.LIVE + Consts.INVALID_TOKEN);
+        System.out.println(response.asString());
+        response.then().statusCode(401);
+        response.then().body("message", containsString("Invalid authentication"));
+
+    }
+
+    @Test
+    public void missingTokenTest() {
+        response = given().get(Consts.CURRENCY_API_URL + Consts.LIVE + null);
+        System.out.println(response.asString());
+        response.then().statusCode(401);
+        response.then().body("message", containsString("No API key found in request"));
+    }
+
 
     @Test
     public void wrongCurrencyTest() {
         response = given().contentType("application/json").get(Consts.CURRENCY_API_URL + Consts.LIVE  + Consts.TOKEN + "&source=" + Consts.USD + Consts.CURRENCIES + "=DAC");
         response.then().body("error.code", equalTo(202));
         System.out.println(response.asString());
+        response.then().statusCode(200);
+        response.then().body("success", equalTo(false));
+        response.then().body("error.code", equalTo(202));
+        response.then().body("error.info", containsString("You have provided one or more invalid Currency Codes"));
 
     }
 
@@ -86,13 +107,13 @@ public class CurrencyAPITest {
         System.out.println(response.asString());
         response.then().statusCode(200);
         response.then().body("success", equalTo(false));
-        response.then().body("error.code", equalTo(xxx));
-        response.then().body("error.info", containsString("xxx"));
+        response.then().body("error.code", equalTo(403));
+        response.then().body("error.info", containsString("You have not specified an amount to be converted"));
 
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"1991-01-21", "2001-03-07", "2021-02-21"})
+    @ValueSource(strings = {"1999-01-21", "2001-03-07", "2021-02-21"})
     public void historicalConversionTest(String date) {
         response = given().contentType("application/json").get(Consts.CURRENCY_API_URL + Consts.HISTORICAL  + date + "&" + Consts.TOKEN);
         System.out.println(response.asString());
@@ -106,9 +127,8 @@ public class CurrencyAPITest {
         response = given().contentType("application/json").get(Consts.CURRENCY_API_URL + Consts.HISTORICAL  + date + "&" + Consts.TOKEN);
         System.out.println(response.asString());
         response.then().statusCode(200);
-        response.then().body("error.code", equalTo(xxx));
-        response.then().body("success", equalTo(false));
-        response.then().body("error.info", containsString("xxx"));
+        response.then().body("error.code", equalTo(106));
+        response.then().body("error.info", containsString("Your query did not return any results."));
     }
 
     @Test
@@ -117,8 +137,8 @@ public class CurrencyAPITest {
         System.out.println(response.asString());
         response.then().statusCode(200);
         response.then().body("success", equalTo(false));
-        response.then().body("error.code", equalTo(xxx));
-        response.then().body("error.info", containsString("xxx"));
+        response.then().body("error.code", equalTo(302));
+        response.then().body("error.info", containsString("You have entered an invalid date."));
 
     }
 
@@ -142,8 +162,8 @@ public class CurrencyAPITest {
         System.out.println(response.asString());
         response.then().statusCode(200);
         response.then().body("success", equalTo(false));
-        response.then().body("error.code", equalTo(xxx));
-        response.then().body("error.info", containsString("xxx"));
+        response.then().body("error.code", equalTo(505));
+        response.then().body("error.info", containsString("The Time-Frame you entered is too long."));
     }
 
     @Test
@@ -152,8 +172,8 @@ public class CurrencyAPITest {
         System.out.println(response.asString());
         response.then().statusCode(200);
         response.then().body("success", equalTo(false));
-        response.then().body("error.code", equalTo(xxx));
-        response.then().body("error.info", containsString("xxx"));
+        response.then().body("error.code", equalTo(502));
+        response.then().body("error.info", containsString("You have specified an invalid start date."));
     }
 
     @Test
@@ -162,8 +182,8 @@ public class CurrencyAPITest {
         System.out.println(response.asString());
         response.then().statusCode(200);
         response.then().body("success", equalTo(false));
-        response.then().body("error.code", equalTo(xxx));
-        response.then().body("error.info", containsString("xxx"));
+        response.then().body("error.code", equalTo(503));
+        response.then().body("error.info", containsString("You have specified an invalid end date."));
     }
 
 }
