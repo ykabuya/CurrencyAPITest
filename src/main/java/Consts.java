@@ -1,7 +1,7 @@
 public class Consts {
 
-    public static final String TOKEN = "apikey=VCAKl8lA05pDPwghjdL3q3Kk7jj4KZuS";
-    public static final String INVALID_TOKEN = "apikey=VCAKl8lA05pDPwghjdL3q3Kk7jj4KZuSSSS";
+    public static final String TOKEN = "apikey=aBzbf58OXICcqfDGLnng9WQ0C4mQhlgt";
+    public static final String INVALID_TOKEN = "aBzbf58OXICcqfDGLnng9WQ0C4mQhlgtSSS";
 
     public static final String CURRENCY_API_URL = "https://api.apilayer.com/currency_data";
     public static final String LIST = "list";
